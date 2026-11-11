@@ -60,7 +60,6 @@ void main() {
         exam: exam,
         engine: engine,
         progressRepo: repo,
-        passScoreThreshold: 70.0,
       );
       addTearDown(ctrl.dispose);
 

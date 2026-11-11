@@ -85,8 +85,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Increase pass threshold from 70 -> 75 and select revenge streak 3 lần
-    await tester.tap(find.byTooltip('Tăng 5 điểm'));
+    // Increase topic mastery target from 70% -> 75% and select revenge streak 3 lần
+    expect(find.text('Mục tiêu nắm vững chuyên đề'), findsOneWidget);
+    await tester.tap(find.byTooltip('Tăng 5%'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('3 lần'));
     await tester.pumpAndSettle();
@@ -125,7 +126,7 @@ void main() {
 
     final scorePillContainer = tester.widget<Container>(
       find.ancestor(
-        of: find.text('75 điểm'),
+        of: find.text('75%'),
         matching: find.byType(Container),
       ).first,
     );
