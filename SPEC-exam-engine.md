@@ -31,7 +31,7 @@ Xây dựng lõi thuật toán ra đề, trộn câu hỏi/đáp án và chấm 
 4. **Xáo trộn câu & đảo đáp án mỗi lượt thi:**
    - 70 câu được xáo trộn lẫn lộn giữa 13 chuyên đề (không xếp thành từng cụm Chuyên đề 1 -> Chuyên đề 13).
    - 4 đáp án của mỗi câu được xáo trộn bằng `Fisher-Yates`, gán nhãn hiển thị mới (`A`, `B`, `C`, `D`) tương ứng vị trí `0..3` và cập nhật chính xác `correctDisplayIndex`.
-5. **Chấm điểm thang 100 & trích xuất câu sai:** Khi nộp bài (thủ công hoặc hết 60 phút tự nộp), chấm điểm tự động thang 100 (`(correct / total) * 100`), xuất `isPassed` theo ngưỡng `passThreshold` truyền vào từ cài đặt, phân tích điểm từng chuyên đề (`TopicBreakdown`), và trả danh sách `wrongQuestionCodes` để chuyển sang chế độ **Làm lại câu sai**.
+5. **Chấm điểm thang 100, xếp loại 5 mức & trích xuất câu sai:** Khi nộp bài (thủ công hoặc hết 60 phút tự nộp), chấm điểm tự động thang 100 (`(correct / total) * 100`), gán xếp loại 5 mức (`Xuất sắc` >= 90%, `Giỏi` 80%–<90%, `Khá` 60%–<80%, `Trung bình` 50%–<60%, `Không đạt yêu cầu` < 50%; `isPassed` mặc định từ `50.0` cho **Thi thử** và **Mini-test**), phân tích điểm từng chuyên đề (`TopicBreakdown`), và trả danh sách `wrongQuestionCodes` để chuyển sang chế độ **Làm lại câu sai**.
 6. **Tạo phiên làm lại câu sai & Mini-test chẩn đoán:**
    - Từ danh sách `wrongQuestionCodes`, tạo phiên luyện lại gồm đúng các câu đó với thứ tự và 4 đáp án được đảo mới hoàn toàn.
    - Tạo **Mini-test chẩn đoán** (mặc định 26 câu = 2 câu/chuyên đề, hoặc số câu có sẵn nếu chuyên đề ít hơn) vẫn giữ nguyên quy tắc tách `pointGroupKey` và đảo đáp án.
@@ -62,16 +62,17 @@ Xây dựng lõi thuật toán ra đề, trộn câu hỏi/đáp án và chấm 
 4. Sau khi thu đủ 70 `Question`, chạy `Fisher-Yates` xáo trộn toàn bộ danh sách 70 câu, rồi đảo 4 đáp án từng câu để dựng `GeneratedExam`.
 
 ### 3. Hợp đồng Dart xuất cho `study-progress` và `mobile-ui`
-- `ExamConfig`: `totalQuestions` (mặc định `70`), `durationSeconds` (mặc định `3600`), `passScoreThreshold` (mặc định `70.0`).
+- `ExamConfig`: `totalQuestions` (mặc định `70`), `durationSeconds` (mặc định `3600`), `passScoreThreshold` (mặc định `50.0` theo chuẩn đạt yêu cầu từ mức *Trung bình*).
+- `ExamRank`: `excellent` (`Xuất sắc`, `>= 90%`), `good` (`Giỏi`, `80%..<90%`), `fair` (`Khá`, `60%..<80%`), `average` (`Trung bình`, `50%..<60%`), `fail` (`Không đạt yêu cầu`, `< 50%`).
 - `GeneratedExam`: `examId`, `mode` (`mockExam` | `diagnosticMiniTest` | `retryWrong`), `durationSeconds`, `createdAt`, `items` (`List<ExamQuestion>`).
 - `ExamQuestion`: `position` (`1..N`), `questionCode`, `topicId`, `topicName`, `stem`, `shuffledOptions` (`List<ShuffledOption>` gồm `displayLabel` `'A'..'D'`, `text`, `originalIndex`), `correctDisplayIndex`, `explanation`, `legalReference`, `pointGroupKey`, `pointGroupLabel`.
 - `ExamSubmission`: `exam`, `selectedOptionByPosition` (`Map<int, int>`), `elapsedSeconds`, `submittedAt`, `autoSubmittedByTimeout` (`bool`).
-- `ExamEvaluationResult`: `examId`, `totalQuestions`, `correctCount`, `unansweredCount`, `scoreOn100` (`double`), `isPassed` (`bool`), `passScoreThreshold` (`double`), `topicBreakdowns` (`List<TopicBreakdown>`), `wrongQuestionCodes` (`List<String>`), `itemOutcomes` (`List<QuestionOutcome>`).
+- `ExamEvaluationResult`: `examId`, `totalQuestions`, `correctCount`, `unansweredCount`, `scoreOn100` (`double`), `rank` (`ExamRank`), `isPassed` (`bool`), `passScoreThreshold` (`double`), `topicBreakdowns` (`List<TopicBreakdown>`), `wrongQuestionCodes` (`List<String>`), `itemOutcomes` (`List<QuestionOutcome>`).
 - `ExamEngine` (service interface):
   - `ExamResult<GeneratedExam> generateMockExam(QuestionBank bank, {ExamConfig config, Random? random})`
   - `ExamResult<GeneratedExam> generateDiagnosticTest(QuestionBank bank, {int perTopic = 2, Random? random})`
   - `ExamResult<GeneratedExam> generateRetrySession(QuestionBank bank, List<String> questionCodes, {Random? random})`
-  - `ExamEvaluationResult gradeExam(ExamSubmission submission, {double passScoreThreshold = 70.0})`
+  - `ExamEvaluationResult gradeExam(ExamSubmission submission, {double passScoreThreshold = 50.0})`
 
 ---
 

@@ -40,11 +40,11 @@ Xây dựng toàn bộ giao diện người dùng và luồng điều hướng m
    - **Cảnh báo trước khi nộp thủ công:** Nếu còn câu chưa trả lời (hoặc câu đánh dấu xem lại), hiện hộp thoại nhắc số lượng cụ thể kèm nút *"Kiểm tra câu chưa làm đầu tiên"* và *"Nộp bài ngay"*.
    - **Chặn thoát nhầm (`PopScope`):** Hỏi xác nhận nếu bấm nút Back khi đang thi.
 5. **Màn hình Kết quả & Lịch sử:**
-   - Hiển thị điểm thang **100** (ví dụ `78.57 / 100`), huy hiệu **ĐẠT** / **CHƯA ĐẠT** theo ngưỡng cài đặt, số câu đúng / sai / bỏ trống, bảng phân tích từng chuyên đề trong 13 chuyên đề.
+   - Hiển thị điểm thang **100** (ví dụ `78.57 / 100 điểm`), huy hiệu xếp loại 5 mức (**Xuất sắc** >= 90%, **Giỏi** 80%–<90%, **Khá** 60%–<80%, **Trung bình** 50%–<60%, **Không đạt yêu cầu** < 50%) cùng bảng quy đổi xếp loại cho **Thi thử** và **Mini-test** (chế độ *Luyện lại câu sai* chỉ hiện điểm & số câu đúng/sai), số câu đúng / sai / bỏ trống, bảng phân tích từng chuyên đề trong 13 chuyên đề.
    - Nút nổi bật **"Luyện lại riêng các câu vừa sai (`M` câu)"** (chỉ hiện nếu `M > 0`).
    - Danh sách xem lại từng câu kèm lọc (*Tất cả* / *Chỉ câu sai* / *Chỉ câu đúng*), hiện đáp án bạn chọn vs đáp án đúng + căn cứ pháp lý + nút xem cụm cùng điểm (nếu có trong kho hiện tại).
 6. **Cài đặt & Upload file cập nhật ngân hàng câu hỏi:**
-   - Điều chỉnh: Điểm Đạt (`50..95`, bước `5`), Số lần đúng gỡ cờ yếu (`1..5`), Thời gian thi thử (`30 / 45 / 60 / 90 phút`), Số câu/chuyên đề Mini-test (`1` hoặc `2`).
+   - Điều chỉnh: Mục tiêu nắm vững chuyên đề (`50%..95%`, bước `5%`), Số lần đúng gỡ cờ yếu (`1..5`), Thời gian thi thử (`30 / 45 / 60 / 90 phút`), Số câu/chuyên đề Mini-test (`1` hoặc `2`).
    - Phần **Ngân hàng câu hỏi**: Xem phiên bản & số câu hiện tại, nút **"Cập nhật từ file (.bex / .xlsx)"** mở trình chọn file hệ thống -> validate -> hiển thị hộp thoại xác nhận số câu/chuyên đề mới trước khi thay thế an toàn, hoặc liệt kê rõ lỗi dòng nếu file Excel sai; nút **"Khôi phục bộ câu hỏi mặc định"**.
 
 ---

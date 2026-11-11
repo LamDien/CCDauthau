@@ -51,3 +51,21 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+// Also export a version-tagged copy alongside app-release.apk without breaking Flutter CLI output lookup.
+val releaseVersionName = android.defaultConfig.versionName ?: "1.0.0"
+val releaseApkFile = layout.buildDirectory.file("outputs/apk/release/app-release.apk")
+val flutterApkDir = layout.buildDirectory.dir("outputs/flutter-apk")
+
+tasks.matching { it.name == "assembleRelease" }.configureEach {
+    doLast {
+        val sourceApk = releaseApkFile.get().asFile
+        if (sourceApk.exists()) {
+            val targetDir = flutterApkDir.get().asFile
+            targetDir.mkdirs()
+            val targetApk = targetDir.resolve("CCDauthau-v$releaseVersionName.apk")
+            sourceApk.copyTo(targetApk, overwrite = true)
+            println("Exported versioned APK: ${targetApk.absolutePath}")
+        }
+    }
+}

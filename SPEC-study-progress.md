@@ -22,10 +22,10 @@ Quản lý toàn bộ trạng thái học tập cá nhân, lịch sử thi thử
 - Tổng hợp **Bản đồ năng lực 13 chuyên đề** (Đỏ / Vàng / Xanh) và **Chỉ số sẵn sàng đi thi** trên Trang chủ.
 - Duy trì **Hàng đợi Phục thù câu sai** với ngưỡng số lần làm đúng liên tiếp tùy chỉnh được trong Setting (mặc định `2` lần).
 - Quản lý **Danh sách câu tự chọn (Bookmarks)** để làm riêng khi ôn tập.
-- Cho phép tùy chỉnh ngưỡng điểm Đạt (mặc định `70/100`) và ngưỡng phục thù trong **Cài đặt (Setting)**.
+- Cho phép tùy chỉnh **Mục tiêu nắm vững chuyên đề** (`passScoreThreshold`, mặc định `70%` cho Bản đồ 13 chuyên đề) và ngưỡng phục thù trong **Cài đặt (Setting)**; bài thi thử & Mini-test chấm đạt từ `50/100` theo bảng xếp loại 5 mức.
 
 ### User Stories & Acceptance Criteria
-1. **Ghi nhận kết quả Thi thử & Lịch sử không giới hạn:** Sau khi nộp đề thi thử (hoặc Mini-test), `study-progress` lưu vĩnh viễn bản ghi lịch sử gồm thời gian, thời lượng làm, điểm thang 100, trạng thái Đạt/Chưa đạt theo ngưỡng tại thời điểm thi, phân tích 13 chuyên đề và snapshot toàn bộ 70 câu đã làm + đáp án người dùng chọn. Xem lại lịch sử trả về danh sách sắp xếp mới nhất lên đầu.
+1. **Ghi nhận kết quả Thi thử & Lịch sử không giới hạn:** Sau khi nộp đề thi thử (hoặc Mini-test), `study-progress` lưu vĩnh viễn bản ghi lịch sử gồm thời gian, thời lượng làm, điểm thang 100, trạng thái đạt yêu cầu (`>= 50/100`) và suy xuất xếp hạng (`ExamRank`), phân tích 13 chuyên đề và snapshot toàn bộ 70 câu đã làm + đáp án người dùng chọn. Xem lại lịch sử trả về danh sách sắp xếp mới nhất lên đầu.
 2. **Vòng lặp "Phục thù câu sai":**
    - Bất kỳ câu nào trả lời sai (trong Thi thử, Mini-test hoặc Ôn chuyên đề) lập tức được đặt `isWeakFlagged = true` và `revengeStreak = 0`.
    - Khi trả lời đúng lại câu đang mang cờ yếu ở **bất kỳ chế độ nào** (Ôn chuyên đề, Thi thử, Mini-test, Phục thù câu sai, hoặc Làm lại câu sai từ đề thi), mỗi lần trả lời đúng tăng `revengeStreak += 1`; khi `revengeStreak >= settings.revengeRequiredStreak` (mặc định `2`), tự động đặt `isWeakFlagged = false` (gỡ khỏi danh sách yếu). Nếu trả lời sai lại giữa chừng, `revengeStreak` reset về `0`.

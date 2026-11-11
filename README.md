@@ -2,14 +2,14 @@
 
 Ứng dụng di động (Flutter Android) hỗ trợ ôn tập và thi thử ngoại tuyến cho kỳ thi sát hạch Chứng chỉ nghiệp vụ chuyên môn về Đấu thầu (Bộ Tài chính).
 
-## Tính năng chính (v1.0.0)
+## Tính năng chính (v1.1.0)
 
 - **Hoạt động 100% offline, không cần đăng nhập:** Toàn bộ ngân hàng 430 câu hỏi thuộc 13 chuyên đề được đóng gói và mã hoá cục bộ tại [assets/vault/default_bank.bex](assets/vault/default_bank.bex); lịch sử thi và tiến độ cá nhân được lưu bằng SQLite trên thiết bị.
 - **Thi thử chuẩn đề (70 câu / 60 phút):**
   - Phân bổ tỷ lệ câu hỏi theo 13 chuyên đề bằng thuật toán phần dư lớn nhất (Largest Remainder / Hamilton).
   - Tách các câu hỏi thuộc cùng một nhóm điểm (`Nhom_Cung_Diem`) để tránh gợi ý đáp án chéo.
   - Xáo trộn thứ tự câu hỏi và đảo vị trí các đáp án A/B/C/D ở mỗi lượt thi.
-  - Đồng hồ đếm ngược (tuỳ chỉnh 30/45/60/90 phút), tự nộp bài khi hết giờ, 2 chế độ xem (*Từng câu* / *Toàn bộ đề*), bảng điều hướng 70 câu, cảnh báo câu chưa trả lời, chấm điểm tự động thang 100 và xem giải thích chi tiết sau khi nộp.
+  - Đồng hồ đếm ngược (tuỳ chỉnh 30/45/60/90 phút), tự nộp bài khi hết giờ, 2 chế độ xem (*Từng câu* / *Toàn bộ đề*), bảng điều hướng 70 câu, cảnh báo câu chưa trả lời, chấm điểm tự động thang 100 kèm xếp loại 5 mức (`Xuất sắc`, `Giỏi`, `Khá`, `Trung bình`, `Không đạt yêu cầu`) và xem giải thích chi tiết sau khi nộp.
 - **Ôn thi thông minh:**
   - Ôn theo từng chuyên đề trong 13 chuyên đề.
   - Mini-test chẩn đoán nhanh (1 hoặc 2 câu mỗi chuyên đề).

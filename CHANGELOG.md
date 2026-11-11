@@ -2,6 +2,17 @@
 
 Tất cả các thay đổi đáng chú ý của dự án **CC Đấu Thầu** đều được ghi nhận tại đây.
 
+## [1.1.0] - 2026-11-11
+
+### Added
+- Xếp loại kết quả bài **Thi thử 70 câu** và **Mini-test chẩn đoán** theo thang điểm 100 với 5 mức chuẩn: **Xuất sắc** (`>= 90%`), **Giỏi** (`80%` đến `< 90%`), **Khá** (`60%` đến `< 80%`), **Trung bình** (`50%` đến `< 60%`) và **Không đạt yêu cầu** (`< 50%`).
+- Bảng quy đổi xếp loại mở rộng ngay trên màn hình Kết quả bài thi (`ExamRankLegendCard`) và hiển thị xếp loại tương ứng cho điểm gần nhất/cao nhất trên Trang chủ.
+- Tự động xuất thêm bản sao file APK release mang số hiệu phiên bản (`CCDauthau-v<version>.apk`) trong quá trình build Android.
+
+### Changed
+- Chuẩn hoá ngưỡng đạt của bài thi về `50/100` (từ mức *Trung bình* trở lên); tách tuỳ chọn trong Cài đặt (`50%..95%`, mặc định `70%`) thành **Mục tiêu nắm vững chuyên đề** cho Bản đồ 13 chuyên đề.
+- Cập nhật màn hình Kết quả và tab Lịch sử hiển thị huy hiệu xếp loại cho **Thi thử 70 câu** & **Mini-test chẩn đoán**, đồng thời giữ chế độ **Luyện lại câu sai** chỉ hiển thị điểm và số câu đúng/sai.
+
 ## [1.0.0] - 2026-11-11
 
 ### Added
