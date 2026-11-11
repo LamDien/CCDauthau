@@ -1,5 +1,7 @@
 import 'package:cc_dau_thau/app/theme/app_theme.dart';
+import 'package:cc_dau_thau/features/exam_engine/domain/models/exam_models.dart';
 import 'package:cc_dau_thau/features/mobile_ui/controllers/app_state_controller.dart';
+import 'package:cc_dau_thau/features/mobile_ui/widgets/exam_rank_badge.dart';
 import 'package:cc_dau_thau/features/mobile_ui/widgets/topic_mastery_grid.dart';
 import 'package:cc_dau_thau/features/study_progress/domain/models/progress_models.dart';
 import 'package:flutter/material.dart';
@@ -154,12 +156,15 @@ class _ReadinessCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lastScoreText = summary.latestMockScore == null
-        ? '--'
-        : '${summary.latestMockScore!.toStringAsFixed(1)}/100';
-    final bestScoreText = summary.bestMockScore == null
-        ? '--'
-        : '${summary.bestMockScore!.toStringAsFixed(1)}/100';
+    final latestScore = summary.latestMockScore;
+    final bestScore = summary.bestMockScore;
+    final lastScoreText =
+        latestScore == null ? '--' : '${latestScore.toStringAsFixed(1)}/100';
+    final bestScoreText =
+        bestScore == null ? '--' : '${bestScore.toStringAsFixed(1)}/100';
+    final latestRank =
+        latestScore == null ? null : ExamRank.fromScore(latestScore);
+    final bestRank = bestScore == null ? null : ExamRank.fromScore(bestScore);
 
     return Card(
       color: AppColors.surfaceCard,
@@ -192,7 +197,7 @@ class _ReadinessCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(
-                        'Ngưỡng đạt mục tiêu: ${passThreshold.toStringAsFixed(0)}/100',
+                        'Mục tiêu nắm vững chuyên đề: ${passThreshold.toStringAsFixed(0)}%',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontSize: 12.5,
                             ),
@@ -221,24 +226,34 @@ class _ReadinessCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 14),
-            Row(
-              children: [
-                _StatPill(
-                  label: 'Đã nắm vững',
-                  value:
-                      '${summary.masteredQuestionsCount}/${summary.totalBankQuestions}',
-                ),
-                const SizedBox(width: 8),
-                _StatPill(
-                  label: 'Thi gần nhất',
-                  value: lastScoreText,
-                ),
-                const SizedBox(width: 8),
-                _StatPill(
-                  label: 'Cao nhất',
-                  value: bestScoreText,
-                ),
-              ],
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _StatPill(
+                    label: 'Đã nắm vững',
+                    value:
+                        '${summary.masteredQuestionsCount}/${summary.totalBankQuestions}',
+                  ),
+                  const SizedBox(width: 8),
+                  _StatPill(
+                    label: 'Thi gần nhất',
+                    value: lastScoreText,
+                    subLabel: latestRank?.label,
+                    subLabelColor: latestRank == null
+                        ? null
+                        : ExamRankStyle.of(latestRank).fg,
+                  ),
+                  const SizedBox(width: 8),
+                  _StatPill(
+                    label: 'Cao nhất',
+                    value: bestScoreText,
+                    subLabel: bestRank?.label,
+                    subLabelColor:
+                        bestRank == null ? null : ExamRankStyle.of(bestRank).fg,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -251,10 +266,14 @@ class _StatPill extends StatelessWidget {
   const _StatPill({
     required this.label,
     required this.value,
+    this.subLabel,
+    this.subLabelColor,
   });
 
   final String label;
   final String value;
+  final String? subLabel;
+  final Color? subLabelColor;
 
   @override
   Widget build(BuildContext context) {
@@ -289,6 +308,22 @@ class _StatPill extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
+            if (subLabel != null) ...[
+              const SizedBox(height: 2),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  subLabel!,
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: subLabelColor ?? AppColors.textSecondary,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

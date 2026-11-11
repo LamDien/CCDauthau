@@ -1,6 +1,7 @@
 import 'package:cc_dau_thau/app/theme/app_theme.dart';
 import 'package:cc_dau_thau/features/data_vault/domain/models/question_bank.dart';
 import 'package:cc_dau_thau/features/exam_engine/domain/models/exam_models.dart';
+import 'package:cc_dau_thau/features/mobile_ui/widgets/exam_rank_badge.dart';
 import 'package:cc_dau_thau/features/mobile_ui/widgets/point_group_sheet.dart';
 import 'package:cc_dau_thau/features/mobile_ui/widgets/question_card.dart';
 import 'package:cc_dau_thau/features/study_progress/domain/models/progress_models.dart';
@@ -97,6 +98,10 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
               unansweredCount: unansweredCount,
               durationLabel: _formatDuration(summary.elapsedSeconds),
             ),
+            if (summary.supportsRanking) ...[
+              const SizedBox(height: 12),
+              ExamRankLegendCard(highlightedRank: summary.rank),
+            ],
             if (wrongCodes.isNotEmpty && widget.onRetryWrongQuestions != null) ...[
               const SizedBox(height: 12),
               FilledButton.icon(
@@ -138,8 +143,10 @@ class _ExamResultScreenState extends State<ExamResultScreen> {
                               '${b.correctCount}/${b.totalInExam}',
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
-                                color: b.correctCount * 100 >=
-                                        b.totalInExam * summary.passThresholdUsed
+                                color: b.totalInExam > 0 &&
+                                        b.correctCount * 100 >=
+                                            b.totalInExam *
+                                                ExamRank.passingScore
                                     ? AppColors.masteredFg
                                     : AppColors.weakFg,
                               ),
@@ -256,10 +263,7 @@ class _ScoreSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final passed = summary.isPassed;
-    final badgeBg = passed ? AppColors.masteredBg : AppColors.weakBg;
-    final badgeFg = passed ? AppColors.masteredFg : AppColors.weakFg;
-    final badgeBorder = passed ? AppColors.masteredBorder : AppColors.weakBorder;
+    final supportsRanking = summary.supportsRanking;
 
     return Card(
       child: Padding(
@@ -267,59 +271,32 @@ class _ScoreSummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${summary.scoreOn100.toStringAsFixed(2)} / 100 điểm',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Ngưỡng đạt: ${summary.passThresholdUsed.toStringAsFixed(0)}/100 • Thời gian: $durationLabel',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 8,
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(
+                    '${summary.scoreOn100.toStringAsFixed(2)} / 100 điểm',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 7,
-                  ),
-                  decoration: BoxDecoration(
-                    color: badgeBg,
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: badgeBorder),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        passed ? LucideIcons.award : LucideIcons.circleX,
-                        size: 16,
-                        color: badgeFg,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        passed ? 'ĐẠT' : 'CHƯA ĐẠT',
-                        style: TextStyle(
-                          color: badgeFg,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                  if (supportsRanking) ExamRankBadge(rank: summary.rank),
+                ],
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              supportsRanking
+                  ? 'Đạt yêu cầu: từ ${ExamRank.passingScore.toStringAsFixed(0)}/100 • Thời gian: $durationLabel'
+                  : 'Thời gian: $durationLabel',
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
             if (summary.autoSubmittedByTimeout) ...[
               const SizedBox(height: 10),

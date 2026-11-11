@@ -83,7 +83,7 @@ class AppStateController extends ChangeNotifier {
       config: ExamConfig(
         totalQuestions: 70,
         durationSeconds: settings.examDurationMinutes * 60,
-        passScoreThreshold: settings.passScoreThreshold,
+        passScoreThreshold: ExamRank.passingScore,
       ),
     );
   }

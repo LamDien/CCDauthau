@@ -11,6 +11,10 @@ abstract final class AppColors {
   static const Color textPrimary = Color(0xFF0F172A);
   static const Color textSecondary = Color(0xFF475569);
 
+  static const Color excellentBg = Color(0xFFEDE9FE);
+  static const Color excellentBorder = Color(0xFFA78BFA);
+  static const Color excellentFg = Color(0xFF5B21B6);
+
   static const Color masteredBg = Color(0xFFDCFCE7);
   static const Color masteredBorder = Color(0xFF4ADE80);
   static const Color masteredFg = Color(0xFF15803D);

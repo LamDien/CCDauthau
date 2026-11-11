@@ -1,6 +1,7 @@
 import 'package:cc_dau_thau/app/theme/app_theme.dart';
 import 'package:cc_dau_thau/features/exam_engine/domain/models/exam_models.dart';
 import 'package:cc_dau_thau/features/mobile_ui/controllers/app_state_controller.dart';
+import 'package:cc_dau_thau/features/mobile_ui/widgets/exam_rank_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -81,11 +82,6 @@ class HistoryTab extends StatelessWidget {
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final item = history[index];
-        final passed = item.isPassed;
-        final badgeBg = passed ? AppColors.masteredBg : AppColors.weakBg;
-        final badgeFg = passed ? AppColors.masteredFg : AppColors.weakFg;
-        final badgeBorder =
-            passed ? AppColors.masteredBorder : AppColors.weakBorder;
 
         return Card(
           child: InkWell(
@@ -93,13 +89,13 @@ class HistoryTab extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             child: Padding(
               padding: const EdgeInsets.all(14),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Wrap(
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Wrap(
                           spacing: 8,
                           runSpacing: 4,
                           crossAxisAlignment: WrapCrossAlignment.center,
@@ -131,55 +127,39 @@ class HistoryTab extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '${item.scoreOn100.toStringAsFixed(2)} / 100 điểm',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${item.correctCount}/${item.totalQuestions} câu đúng • ${_formatElapsed(item.elapsedSeconds)}',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: 13,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: badgeBg,
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(color: badgeBorder),
-                        ),
-                        child: Text(
-                          passed ? 'ĐẠT' : 'CHƯA ĐẠT',
-                          style: TextStyle(
-                            color: badgeFg,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(width: 8),
                       const Icon(
                         LucideIcons.chevronRight,
                         size: 18,
                         color: AppColors.textSecondary,
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        '${item.scoreOn100.toStringAsFixed(2)} / 100 điểm',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      if (item.supportsRanking)
+                        ExamRankBadge(rank: item.rank, compact: true),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${item.correctCount}/${item.totalQuestions} câu đúng • ${_formatElapsed(item.elapsedSeconds)}',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 13,
+                        ),
                   ),
                 ],
               ),

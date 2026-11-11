@@ -69,7 +69,7 @@ class CcDauThauApp extends StatelessWidget {
         exam: exam,
         engine: dependencies.examEngine,
         progressRepo: dependencies.progressRepository,
-        passScoreThreshold: appState.settings.passScoreThreshold,
+        passScoreThreshold: ExamRank.passingScore,
       );
       Navigator.of(navContext).push(
         MaterialPageRoute<void>(

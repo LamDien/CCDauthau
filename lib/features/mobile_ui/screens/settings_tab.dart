@@ -252,15 +252,29 @@ class _SettingsTabState extends State<SettingsTab> {
                 ),
                 const SizedBox(height: 14),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Expanded(
-                      child: Text(
-                        'Ngưỡng điểm Đạt (thang 100)',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Mục tiêu nắm vững chuyên đề',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Dùng cho Bản đồ 13 chuyên đề. Bài thi chấm Đạt từ 50/100 theo bảng xếp loại.',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     IconButton(
-                      tooltip: 'Giảm 5 điểm',
+                      tooltip: 'Giảm 5%',
                       onPressed: settings.passScoreThreshold >
                               UserSettings.minPassScoreThreshold
                           ? () => _updateSettings(
@@ -285,7 +299,7 @@ class _SettingsTabState extends State<SettingsTab> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${settings.passScoreThreshold.toStringAsFixed(0)} điểm',
+                        '${settings.passScoreThreshold.toStringAsFixed(0)}%',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w800,
@@ -293,7 +307,7 @@ class _SettingsTabState extends State<SettingsTab> {
                       ),
                     ),
                     IconButton(
-                      tooltip: 'Tăng 5 điểm',
+                      tooltip: 'Tăng 5%',
                       onPressed: settings.passScoreThreshold <
                               UserSettings.maxPassScoreThreshold
                           ? () => _updateSettings(

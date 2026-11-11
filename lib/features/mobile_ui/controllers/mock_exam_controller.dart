@@ -12,7 +12,7 @@ class MockExamController extends ChangeNotifier {
     required this.exam,
     required this._engine,
     required this._progressRepo,
-    required this._passScoreThreshold,
+    this.passScoreThreshold = ExamRank.passingScore,
     DateTime Function()? clock,
   })  : _clock = clock ?? _defaultClock,
         remainingSeconds = exam.durationSeconds;
@@ -22,7 +22,7 @@ class MockExamController extends ChangeNotifier {
   final GeneratedExam exam;
   final ExamEngine _engine;
   final StudyProgressRepository _progressRepo;
-  final double _passScoreThreshold;
+  final double passScoreThreshold;
   final DateTime Function() _clock;
 
   int remainingSeconds;
@@ -142,7 +142,7 @@ class MockExamController extends ChangeNotifier {
 
     final evaluation = _engine.gradeExam(
       submission,
-      passScoreThreshold: _passScoreThreshold,
+      passScoreThreshold: passScoreThreshold,
     );
     final entry = await _progressRepo.recordExamEvaluation(
       submission,
