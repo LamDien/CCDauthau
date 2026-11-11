@@ -3,7 +3,7 @@ import 'package:cc_dau_thau/features/exam_engine/domain/models/exam_models.dart'
 /// Mastery status of a topic for the 13-topic competency map.
 enum MasteryLevel { unassessed, weak, developing, mastered }
 
-/// Configurable thresholds and exam timing preferences stored locally.
+/// Configurable topic-mastery target, revenge streak, and exam timing preferences stored locally.
 class UserSettings {
   const UserSettings({
     this.passScoreThreshold = 70.0,
@@ -19,6 +19,7 @@ class UserSettings {
   static const List<int> allowedExamDurations = [30, 45, 60, 90];
   static const List<int> allowedDiagnosticPerTopic = [1, 2];
 
+  /// Target accuracy percentage (50..95%) used to turn a topic green on the 13-topic map.
   final double passScoreThreshold;
   final int revengeRequiredStreak;
   final int examDurationMinutes;
@@ -32,7 +33,7 @@ class UserSettings {
       throw ArgumentError.value(
         passScoreThreshold,
         'passScoreThreshold',
-        'Ngưỡng điểm Đạt phải nằm trong khoảng $minPassScoreThreshold..$maxPassScoreThreshold.',
+        'Mục tiêu nắm vững chuyên đề phải nằm trong khoảng $minPassScoreThreshold..$maxPassScoreThreshold.',
       );
     }
     if (revengeRequiredStreak < minRevengeStreak ||
@@ -230,6 +231,12 @@ class ExamHistorySummary {
   final double passThresholdUsed;
   final bool isPassed;
   final List<TopicBreakdown> topicBreakdowns;
+
+  /// 5-tier exam classification computed from [scoreOn100].
+  ExamRank get rank => ExamRank.fromScore(scoreOn100);
+
+  /// Whether this attempt displays the 5-tier classification badge.
+  bool get supportsRanking => mode.supportsRanking;
 }
 
 /// Immutable snapshot of one exam question and the user's selected choice.

@@ -112,7 +112,7 @@ final class ExamEngine {
   /// Grades [submission] on a 100-point scale against [passScoreThreshold].
   ExamEvaluationResult gradeExam(
     ExamSubmission submission, {
-    double passScoreThreshold = 70.0,
+    double passScoreThreshold = ExamRank.passingScore,
   }) {
     return _grader.grade(
       submission,

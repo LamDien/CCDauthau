@@ -2,7 +2,62 @@
 enum ExamMode {
   mockExam,
   diagnosticMiniTest,
-  retryWrong,
+  retryWrong;
+
+  /// Whether completed attempts in this mode receive the 5-tier exam rank.
+  bool get supportsRanking => this != ExamMode.retryWrong;
+}
+
+/// Official 5-tier exam classification on a 100-point scale.
+enum ExamRank {
+  excellent(
+    label: 'Xuất sắc',
+    rangeLabel: 'Từ 90% trở lên',
+    isPassed: true,
+  ),
+  good(
+    label: 'Giỏi',
+    rangeLabel: 'Từ 80% đến dưới 90%',
+    isPassed: true,
+  ),
+  fair(
+    label: 'Khá',
+    rangeLabel: 'Từ 60% đến dưới 80%',
+    isPassed: true,
+  ),
+  average(
+    label: 'Trung bình',
+    rangeLabel: 'Từ 50% đến dưới 60%',
+    isPassed: true,
+  ),
+  fail(
+    label: 'Không đạt yêu cầu',
+    rangeLabel: 'Dưới 50%',
+    isPassed: false,
+  );
+
+  const ExamRank({
+    required this.label,
+    required this.rangeLabel,
+    required this.isPassed,
+  });
+
+  final String label;
+  final String rangeLabel;
+  final bool isPassed;
+
+  /// Minimum 100-point score required to achieve a passing classification.
+  static const double passingScore = 50.0;
+
+  /// Classifies a 0..100 score into one of the 5 official ranking tiers.
+  static ExamRank fromScore(double scoreOn100) {
+    const eps = 1e-9;
+    if (scoreOn100 >= 90.0 - eps) return ExamRank.excellent;
+    if (scoreOn100 >= 80.0 - eps) return ExamRank.good;
+    if (scoreOn100 >= 60.0 - eps) return ExamRank.fair;
+    if (scoreOn100 >= passingScore - eps) return ExamRank.average;
+    return ExamRank.fail;
+  }
 }
 
 /// Parameters controlling mock exam generation and grading.
@@ -10,7 +65,7 @@ final class ExamConfig {
   const ExamConfig({
     this.totalQuestions = 70,
     this.durationSeconds = 3600,
-    this.passScoreThreshold = 70.0,
+    this.passScoreThreshold = ExamRank.passingScore,
   });
 
   final int totalQuestions;
@@ -151,7 +206,7 @@ final class QuestionOutcome {
   final bool isCorrect;
 }
 
-/// Complete grading evaluation on a 100-point scale.
+/// Complete grading evaluation on a 100-point scale with official ranking.
 final class ExamEvaluationResult {
   ExamEvaluationResult({
     required this.examId,
@@ -159,6 +214,7 @@ final class ExamEvaluationResult {
     required this.correctCount,
     required this.unansweredCount,
     required this.scoreOn100,
+    required this.rank,
     required this.isPassed,
     required this.passScoreThreshold,
     required List<TopicBreakdown> topicBreakdowns,
@@ -173,6 +229,7 @@ final class ExamEvaluationResult {
   final int correctCount;
   final int unansweredCount;
   final double scoreOn100;
+  final ExamRank rank;
   final bool isPassed;
   final double passScoreThreshold;
   final List<TopicBreakdown> topicBreakdowns;

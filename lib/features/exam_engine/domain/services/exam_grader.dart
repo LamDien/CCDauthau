@@ -1,13 +1,13 @@
 import 'package:cc_dau_thau/features/exam_engine/domain/models/exam_models.dart';
 
-/// Grades an [ExamSubmission] on a 100-point scale and extracts topic
-/// breakdowns plus wrong question codes for follow-up review.
+/// Grades an [ExamSubmission] on a 100-point scale, assigns its 5-tier rank,
+/// and extracts topic breakdowns plus wrong question codes for follow-up review.
 final class ExamGrader {
   const ExamGrader();
 
   ExamEvaluationResult grade(
     ExamSubmission submission, {
-    double passScoreThreshold = 70.0,
+    double passScoreThreshold = ExamRank.passingScore,
   }) {
     final items = submission.exam.items;
     var correctCount = 0;
@@ -61,6 +61,7 @@ final class ExamGrader {
 
     final total = items.length;
     final scoreOn100 = total == 0 ? 0.0 : (correctCount * 100.0) / total;
+    final rank = ExamRank.fromScore(scoreOn100);
     final isPassed = scoreOn100 >= passScoreThreshold - 1e-9;
 
     return ExamEvaluationResult(
@@ -69,6 +70,7 @@ final class ExamGrader {
       correctCount: correctCount,
       unansweredCount: unansweredCount,
       scoreOn100: scoreOn100,
+      rank: rank,
       isPassed: isPassed,
       passScoreThreshold: passScoreThreshold,
       topicBreakdowns: breakdowns,
