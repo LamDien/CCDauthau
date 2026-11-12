@@ -78,6 +78,7 @@ void main() {
                 fileName: 'ngan_hang_loi.xlsx',
                 bytes: Uint8List.fromList([1, 2, 3]),
               ),
+              appVersionLoader: () async => '1.2.0',
             ),
           ),
         ),
@@ -165,16 +166,61 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(aboutHeading, findsOneWidget);
+    expect(find.text('v1.2.0'), findsOneWidget);
     expect(
       find.text('Ứng dụng hỗ trợ ôn thi Chứng chỉ Đấu thầu'),
       findsOneWidget,
     );
-    expect(find.text('Phiên bản Ngân hàng 430 câu hỏi'), findsOneWidget);
+    expect(
+      find.text('Phiên bản Ngân hàng ${bank.questions.length} câu hỏi'),
+      findsOneWidget,
+    );
     expect(find.text('Lam Điền @ 2026'), findsOneWidget);
 
     final resetBtnTop =
         tester.getTopLeft(find.text('Xoá toàn bộ lịch sử & tiến độ học')).dy;
     final aboutTop = tester.getTopLeft(aboutHeading).dy;
     expect(aboutTop, greaterThan(resetBtnTop));
+  });
+
+  testWidgets('SettingsTab collapses version badge safely when version lookup fails', (tester) async {
+    final bank = buildSampleQuestionBank(countsPerTopic: const [60, 60]);
+    final vaultRepo = _StubVaultRepository(bank);
+    final progressRepo = SqliteProgressRepository(
+      dbPathProvider: () async => inMemoryDatabasePath,
+      dbFactory: databaseFactoryFfiNoIsolate,
+    );
+    addTearDown(progressRepo.close);
+
+    final appState = AppStateController(
+      vaultRepository: vaultRepo,
+      examEngine: ExamEngine(),
+      progressRepository: progressRepo,
+    );
+    await appState.initialize();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.buildLightTheme(),
+        home: Scaffold(
+          body: SettingsTab(
+            controller: appState,
+            appVersionLoader: () => Future<String?>.error(StateError('no channel')),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('Lam Điền @ 2026'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Giới thiệu ứng dụng'), findsOneWidget);
+    expect(find.text('Phiên bản Ngân hàng 120 câu hỏi'), findsOneWidget);
+    expect(find.textContaining('v1.'), findsNothing);
   });
 }

@@ -53,3 +53,6 @@ app.*.map.json
 # Local machine paths and local AdMob ID overrides
 /local.properties
 /ios/Flutter/AdMobLocal.xcconfig
+
+# Local idea and design docs (kept locally, excluded from GitHub)
+/docs/

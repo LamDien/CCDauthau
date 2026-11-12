@@ -8,6 +8,7 @@ import 'package:cc_dau_thau/features/study_progress/domain/models/progress_model
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// File name + raw bytes returned by the system file picker or test double.
 class PickedBankFile {
@@ -26,10 +27,12 @@ class SettingsTab extends StatefulWidget {
     super.key,
     required this.controller,
     this.filePickerOverride,
+    this.appVersionLoader,
   });
 
   final AppStateController controller;
   final Future<PickedBankFile?> Function()? filePickerOverride;
+  final Future<String?> Function()? appVersionLoader;
 
   @override
   State<SettingsTab> createState() => _SettingsTabState();
@@ -40,6 +43,41 @@ class _SettingsTabState extends State<SettingsTab> {
   String? _importStatusMessage;
   bool _importSucceeded = false;
   List<ExcelRowError> _rowErrors = const [];
+  String? _appVersion;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAppVersion();
+  }
+
+  @override
+  void didUpdateWidget(covariant SettingsTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.appVersionLoader != widget.appVersionLoader) {
+      _loadAppVersion();
+    }
+  }
+
+  Future<String?> _loadDefaultAppVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    final version = info.version.trim();
+    return version.isEmpty ? null : version;
+  }
+
+  Future<void> _loadAppVersion() async {
+    try {
+      final loader = widget.appVersionLoader ?? _loadDefaultAppVersion;
+      final version = (await loader())?.trim();
+      if (!mounted) return;
+      final normalized = (version == null || version.isEmpty) ? null : version;
+      if (_appVersion != normalized) {
+        setState(() => _appVersion = normalized);
+      }
+    } catch (_) {
+      // Collapse cleanly when platform package metadata is unavailable.
+    }
+  }
 
   Future<PickedBankFile?> _pickDefaultFile() async {
     final picked = await FilePicker.pickFile(
@@ -539,10 +577,34 @@ class _SettingsTabState extends State<SettingsTab> {
                       color: AppColors.primaryDark,
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      'Giới thiệu ứng dụng',
-                      style: Theme.of(context).textTheme.titleMedium,
+                    Expanded(
+                      child: Text(
+                        'Giới thiệu ứng dụng',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                     ),
+                    if (_appVersion != null) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceTint,
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(color: AppColors.borderSky),
+                        ),
+                        child: Text(
+                          'v$_appVersion',
+                          style: const TextStyle(
+                            color: AppColors.primaryDark,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -556,7 +618,7 @@ class _SettingsTabState extends State<SettingsTab> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Phiên bản Ngân hàng 430 câu hỏi',
+                  'Phiên bản Ngân hàng ${bank?.questions.length ?? 430} câu hỏi',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 4),
