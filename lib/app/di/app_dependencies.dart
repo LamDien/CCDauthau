@@ -1,3 +1,5 @@
+import 'package:cc_dau_thau/features/ads/data/google_mobile_ads_banner_service.dart';
+import 'package:cc_dau_thau/features/ads/domain/ad_banner_service.dart';
 import 'package:cc_dau_thau/features/data_vault/data/file_vault_repository.dart';
 import 'package:cc_dau_thau/features/data_vault/domain/repositories/vault_repository.dart';
 import 'package:cc_dau_thau/features/exam_engine/domain/services/exam_engine.dart';
@@ -9,13 +11,14 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-/// Top-level dependency container for the offline application.
+/// Top-level dependency container for the application.
 class AppDependencies {
   AppDependencies({
     required this.vaultRepository,
     required this.examEngine,
     required this.progressRepository,
     required this.appState,
+    this.adBannerService = const NoopAdBannerService(),
   });
 
   static const String bundledVaultAssetPath = 'assets/vault/default_bank.bex';
@@ -24,6 +27,7 @@ class AppDependencies {
   final ExamEngine examEngine;
   final StudyProgressRepository progressRepository;
   final AppStateController appState;
+  final AdBannerService adBannerService;
 
   factory AppDependencies.createProduction() {
     final vaultRepo = FileVaultRepository(
@@ -53,6 +57,7 @@ class AppDependencies {
       examEngine: examEngine,
       progressRepository: progressRepo,
       appState: appState,
+      adBannerService: GoogleMobileAdsBannerService(),
     );
   }
 }

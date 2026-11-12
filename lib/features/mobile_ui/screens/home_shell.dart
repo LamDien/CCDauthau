@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:cc_dau_thau/app/theme/app_theme.dart';
+import 'package:cc_dau_thau/features/ads/controllers/home_banner_controller.dart';
+import 'package:cc_dau_thau/features/ads/domain/ad_banner_service.dart';
+import 'package:cc_dau_thau/features/ads/widgets/top_anchored_ad_slot.dart';
 import 'package:cc_dau_thau/features/data_vault/domain/models/question_bank.dart';
 import 'package:cc_dau_thau/features/exam_engine/domain/models/exam_models.dart';
 import 'package:cc_dau_thau/features/exam_engine/domain/models/exam_result.dart';
@@ -13,6 +18,8 @@ class HomeShell extends StatefulWidget {
   const HomeShell({
     super.key,
     required this.controller,
+    this.adBannerService = const NoopAdBannerService(),
+    this.routeObserver,
     this.studyTabBuilder,
     this.historyTabBuilder,
     this.settingsTabBuilder,
@@ -21,6 +28,8 @@ class HomeShell extends StatefulWidget {
   });
 
   final AppStateController controller;
+  final AdBannerService adBannerService;
+  final RouteObserver<ModalRoute<void>>? routeObserver;
   final WidgetBuilder? studyTabBuilder;
   final WidgetBuilder? historyTabBuilder;
   final WidgetBuilder? settingsTabBuilder;
@@ -37,8 +46,81 @@ class HomeShell extends StatefulWidget {
   State<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeShellState extends State<HomeShell> {
+class _HomeShellState extends State<HomeShell> with RouteAware {
   int _selectedIndex = 0;
+  late final HomeBannerController _bannerController;
+  ModalRoute<void>? _subscribedRoute;
+  bool _didScheduleSettled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _bannerController = HomeBannerController(service: widget.adBannerService);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != _subscribedRoute) {
+      if (_subscribedRoute != null) {
+        widget.routeObserver?.unsubscribe(this);
+      }
+      _subscribedRoute = route;
+      if (route != null) {
+        widget.routeObserver?.subscribe(this, route);
+      }
+    }
+
+    final media = MediaQuery.of(context);
+    unawaited(
+      _bannerController.syncViewportAndLoad(
+        widthDp: media.size.width.truncate(),
+        orientation: media.orientation,
+      ),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.routeObserver != widget.routeObserver) {
+      oldWidget.routeObserver?.unsubscribe(this);
+      final route = _subscribedRoute;
+      if (route != null) {
+        widget.routeObserver?.subscribe(this, route);
+      }
+    }
+  }
+
+  @override
+  void didPopNext() {
+    _bannerController.onSafeNavigationBoundary();
+  }
+
+  @override
+  void dispose() {
+    widget.routeObserver?.unsubscribe(this);
+    _bannerController.dispose();
+    super.dispose();
+  }
+
+  void _selectTab(int index) {
+    _bannerController.onSafeNavigationBoundary();
+    setState(() => _selectedIndex = index);
+  }
+
+  void _scheduleContentSettledIfReady(AppStateController ctrl) {
+    if (_didScheduleSettled || ctrl.isLoading || ctrl.startupError != null) {
+      return;
+    }
+    _didScheduleSettled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _bannerController.markContentSettled();
+      }
+    });
+  }
 
   Widget _buildAppBarTitle() {
     final tabTitle = switch (_selectedIndex) {
@@ -147,12 +229,13 @@ class _HomeShellState extends State<HomeShell> {
             onRetry: ctrl.initialize,
           );
         } else {
+          _scheduleContentSettledIfReady(ctrl);
           final tabs = <Widget>[
             HomeTab(
               controller: ctrl,
               onStartMockExam: () =>
                   _handleStartExamResult(ctrl.createMockExam()),
-              onOpenStudyTab: () => setState(() => _selectedIndex = 1),
+              onOpenStudyTab: () => _selectTab(1),
               onStartRevengeStudy: _startRevengeStudy,
               onStartDiagnosticMiniTest: () =>
                   _handleStartExamResult(ctrl.createDiagnosticMiniTest()),
@@ -193,12 +276,17 @@ class _HomeShellState extends State<HomeShell> {
                 ),
             ],
           ),
-          body: SafeArea(child: body),
+          body: SafeArea(
+            child: Column(
+              children: [
+                TopAnchoredAdSlot(controller: _bannerController),
+                Expanded(child: body),
+              ],
+            ),
+          ),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _selectedIndex,
-            onDestinationSelected: (index) {
-              setState(() => _selectedIndex = index);
-            },
+            onDestinationSelected: _selectTab,
             destinations: const [
               NavigationDestination(
                 icon: Icon(LucideIcons.house),

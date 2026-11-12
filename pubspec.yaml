@@ -41,6 +41,7 @@ dependencies:
   path: ^1.9.1
   file_picker: ^13.3.3
   lucide_icons_flutter: ^4.0.3
+  google_mobile_ads: ^9.2.0
 
 dev_dependencies:
   flutter_test:

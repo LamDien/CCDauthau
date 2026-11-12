@@ -1,8 +1,46 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+val localProps = Properties().apply {
+    listOf(
+        rootProject.file("local.properties"),
+        rootProject.file("../local.properties"),
+    ).forEach { propsFile ->
+        if (propsFile.exists()) {
+            propsFile.inputStream().use { load(it) }
+        }
+    }
+}
+
+fun resolveAdConfig(vararg keys: String, defaultValue: String): String {
+    for (key in keys) {
+        val gradleProp = project.findProperty(key)?.toString()?.trim()
+        if (!gradleProp.isNullOrEmpty()) return gradleProp
+
+        val localProp = localProps.getProperty(key)?.trim()
+        if (!localProp.isNullOrEmpty()) return localProp
+
+        val envVar = System.getenv(key)?.trim()
+        if (!envVar.isNullOrEmpty()) return envVar
+    }
+    return defaultValue
+}
+
+val admobAppId = resolveAdConfig(
+    "ADMOB_ANDROID_APP_ID",
+    "ADMOB_APP_ID",
+    defaultValue = "ca-app-pub-3940256099942544~3347511713",
+)
+val admobBannerId = resolveAdConfig(
+    "ADMOB_ANDROID_BANNER_ID",
+    "ADMOB_BANNER_ID",
+    defaultValue = "ca-app-pub-3940256099942544/9214589741",
+)
 
 android {
     namespace = "vn.ccdauthau.cc_dau_thau"
@@ -26,6 +64,8 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["admobAppId"] = admobAppId
+        manifestPlaceholders["admobBannerId"] = admobBannerId
     }
 
     buildTypes {

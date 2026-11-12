@@ -49,3 +49,7 @@ app.*.map.json
 
 # Raw plaintext question bank spreadsheets (bundled app uses encrypted assets/vault/default_bank.bex)
 *.xlsx
+
+# Local machine paths and local AdMob ID overrides
+/local.properties
+/ios/Flutter/AdMobLocal.xcconfig

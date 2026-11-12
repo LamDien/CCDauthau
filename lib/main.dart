@@ -20,11 +20,12 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   final dependencies = AppDependencies.createProduction();
   unawaited(dependencies.appState.initialize());
+  unawaited(dependencies.adBannerService.initialize());
   runApp(CcDauThauApp(dependencies: dependencies));
 }
 
 /// Root Flutter widget for the offline bidding certificate prep app.
-class CcDauThauApp extends StatelessWidget {
+class CcDauThauApp extends StatefulWidget {
   const CcDauThauApp({
     super.key,
     required this.dependencies,
@@ -33,7 +34,16 @@ class CcDauThauApp extends StatelessWidget {
   final AppDependencies dependencies;
 
   @override
+  State<CcDauThauApp> createState() => _CcDauThauAppState();
+}
+
+class _CcDauThauAppState extends State<CcDauThauApp> {
+  final RouteObserver<ModalRoute<void>> _routeObserver =
+      RouteObserver<ModalRoute<void>>();
+
+  @override
   Widget build(BuildContext context) {
+    final dependencies = widget.dependencies;
     final appState = dependencies.appState;
 
     void startStudySession(
@@ -118,8 +128,11 @@ class CcDauThauApp extends StatelessWidget {
       title: 'CC Đấu Thầu',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.buildLightTheme(),
+      navigatorObservers: [_routeObserver],
       home: HomeShell(
         controller: appState,
+        adBannerService: dependencies.adBannerService,
+        routeObserver: _routeObserver,
         onStartExamRequested: startGeneratedExam,
         onStartStudyQuestionsRequested: startStudySession,
         studyTabBuilder: (tabContext) => StudyTab(
