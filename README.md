@@ -1,8 +1,8 @@
 # CC Đấu Thầu (ÔN LUYỆN CCĐT)
 
-Ứng dụng di động (Flutter Android) hỗ trợ ôn tập và thi thử ngoại tuyến cho kỳ thi sát hạch Chứng chỉ nghiệp vụ chuyên môn về Đấu thầu (Bộ Tài chính).
+Ứng dụng Flutter (Android, iOS, macOS) hỗ trợ ôn tập và thi thử ngoại tuyến cho kỳ thi sát hạch Chứng chỉ nghiệp vụ chuyên môn về Đấu thầu (Bộ Tài chính).
 
-## Tính năng chính (v1.1.0)
+## Tính năng chính (v1.2.0)
 
 - **Hoạt động 100% offline, không cần đăng nhập:** Toàn bộ ngân hàng 430 câu hỏi thuộc 13 chuyên đề được đóng gói và mã hoá cục bộ tại [assets/vault/default_bank.bex](assets/vault/default_bank.bex); lịch sử thi và tiến độ cá nhân được lưu bằng SQLite trên thiết bị.
 - **Thi thử chuẩn đề (70 câu / 60 phút):**
@@ -45,3 +45,24 @@ Build Android release APK:
 ```bash
 flutter build apk --release --obfuscate --split-debug-info=build/app/outputs/symbols
 ```
+
+## Đóng gói cài đặt iOS & macOS
+
+Build thủ công trên máy Mac có cài đầy đủ **Xcode** và **CocoaPods**:
+
+```bash
+# macOS (.dmg)
+flutter build macos --release --obfuscate --split-debug-info=build/macos/symbols
+./tool/package_macos_dmg.sh
+
+# iOS (.ipa chưa ký để sideload / ký lại bằng Xcode)
+flutter build ios --release --no-codesign --obfuscate --split-debug-info=build/ios/symbols
+./tool/package_ios_unsigned_ipa.sh
+```
+
+Nếu máy cục bộ chưa cài Xcode, workflow GitHub Actions [`build-apple.yml`](.github/workflows/build-apple.yml) tự động chạy trên `macos-latest` khi push lên `main`, tạo tag `v*`, hoặc kích hoạt thủ công (**Run workflow**) để xuất tải về 2 file `CCDauthau-v<version>.dmg` và `CCDauthau-v<version>-unsigned.ipa`.
+
+### Ghi chú cài đặt & Rollback
+- **macOS (`.dmg`):** Mở file `.dmg` và kéo `CC Đấu Thầu.app` vào `Applications`. Vì bản build dùng ad-hoc signing (chưa qua Apple Notarization), ở lần mở đầu tiên có thể cần nhấn chuột phải → **Open** (hoặc **System Settings → Privacy & Security → Open Anyway**).
+- **iOS (`-unsigned.ipa`):** Cài đặt bằng cách ký lại với tài khoản Apple ID qua AltStore / SideStore / Sideloadly / Impactor hoặc archive ký trong Xcode.
+- **Rollback phát hành:** Dữ liệu tiến độ SQLite được lưu hoàn toàn cục bộ trên thiết bị và giữ nguyên khi gỡ/cài lại từ tag trước đó (ví dụ quay về bản Android `v1.1.0` hoặc bản artifact ổn định trước trên GitHub Actions).
