@@ -5,7 +5,7 @@ Tất cả các thay đổi đáng chú ý của dự án **CC Đấu Thầu** �
 ## [1.2.0] - 2026-11-12
 
 ### Added
-- Hỗ trợ target **iOS** (`ios/`) và **macOS** (`macos/`) đồng bộ Bundle ID `vn.ccdauthau.luyenthi`, tên hiển thị `CC Đấu Thầu`, bộ icon Búa đấu thầu cho iOS/macOS và `Podfile` khoá ngưỡng tương thích tối thiểu (`iOS 15.0`, `macOS 12.0`).
+- Hỗ trợ target **iOS** (`ios/`) và **macOS** (`macos/`) đồng bộ Bundle ID `vn.ccdauthau.luyenthi`, tên hiển thị `CC Đấu Thầu`, bộ icon Búa đấu thầu cho iOS/macOS, tích hợp Swift Package Manager (`SwiftPM`) và ngưỡng tương thích tối thiểu (`iOS 15.0`, `macOS 12.0`).
 - Bổ sung quyền App Sandbox `com.apple.security.files.user-selected.read-only` trên macOS để tính năng chọn tệp `.xlsx` / `.bex` trong Cài đặt hoạt động ổn định.
 - Thêm script đóng gói phiên bản [tool/package_macos_dmg.sh](tool/package_macos_dmg.sh) (`CCDauthau-v<version>.dmg`) và [tool/package_ios_unsigned_ipa.sh](tool/package_ios_unsigned_ipa.sh) (`CCDauthau-v<version>-unsigned.ipa`).
 - Thêm GitHub Actions workflow [.github/workflows/build-apple.yml](.github/workflows/build-apple.yml) tự động kiểm tra mã nguồn, chạy test và xuất bản đóng gói macOS `.dmg` & iOS `.ipa` trên runner `macos-latest`.
