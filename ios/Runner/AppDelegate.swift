@@ -12,5 +12,21 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "AdConfigPlugin") {
+      let channel = FlutterMethodChannel(
+        name: "vn.ccdauthau/ad_config",
+        binaryMessenger: registrar.messenger()
+      )
+      channel.setMethodCallHandler { call, result in
+        if call.method == "getAdConfig" {
+          let bannerUnitId = Bundle.main.object(
+            forInfoDictionaryKey: "CcDauThauAdMobBannerId"
+          ) as? String
+          result(["bannerUnitId": bannerUnitId as Any])
+        } else {
+          result(FlutterMethodNotImplemented)
+        }
+      }
+    }
   }
 }

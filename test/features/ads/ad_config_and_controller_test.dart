@@ -119,8 +119,27 @@ void main() {
         platformOverride: TargetPlatform.iOS,
         isDebugModeOverride: false,
         iosDefineOverride: '',
+        iosNativeBannerIdLoader: () async => null,
       );
       expect(iosReleaseDefault, AdConfig.iosTestBannerUnitId);
+
+      final iosNativeInRelease = await AdConfig.resolveBannerUnitId(
+        isWebOverride: false,
+        platformOverride: TargetPlatform.iOS,
+        isDebugModeOverride: false,
+        iosDefineOverride: '',
+        iosNativeBannerIdLoader: () async => fakeNativeUnitId,
+      );
+      expect(iosNativeInRelease, fakeNativeUnitId);
+
+      final iosDefineOverridesNative = await AdConfig.resolveBannerUnitId(
+        isWebOverride: false,
+        platformOverride: TargetPlatform.iOS,
+        isDebugModeOverride: false,
+        iosDefineOverride: 'ca-app-pub-custom/ios-define-unit',
+        iosNativeBannerIdLoader: () async => fakeNativeUnitId,
+      );
+      expect(iosDefineOverridesNative, 'ca-app-pub-custom/ios-define-unit');
 
       final forcedTestAdsInRelease = await AdConfig.resolveBannerUnitId(
         isWebOverride: false,

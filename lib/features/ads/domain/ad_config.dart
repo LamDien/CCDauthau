@@ -46,6 +46,7 @@ abstract final class AdConfig {
     String? androidDefineOverride,
     String? iosDefineOverride,
     Future<String?> Function()? androidNativeBannerIdLoader,
+    Future<String?> Function()? iosNativeBannerIdLoader,
   }) async {
     final isWeb = isWebOverride ?? kIsWeb;
     final platform = platformOverride ?? defaultTargetPlatform;
@@ -71,25 +72,24 @@ abstract final class AdConfig {
           : iosTestBannerUnitId;
     }
 
-    if (platform == TargetPlatform.android) {
-      final defineId =
-          (androidDefineOverride ?? _dartDefineAndroidBannerId).trim();
-      if (defineId.isNotEmpty) return defineId;
+    final isAndroid = platform == TargetPlatform.android;
+    final defineId = (isAndroid
+            ? (androidDefineOverride ?? _dartDefineAndroidBannerId)
+            : (iosDefineOverride ?? _dartDefineIosBannerId))
+        .trim();
+    if (defineId.isNotEmpty) return defineId;
 
-      final nativeLoader =
-          androidNativeBannerIdLoader ?? _readAndroidManifestBannerId;
-      final nativeId = (await nativeLoader())?.trim();
-      if (nativeId != null && nativeId.isNotEmpty) return nativeId;
+    final nativeLoader = (isAndroid
+            ? androidNativeBannerIdLoader
+            : iosNativeBannerIdLoader) ??
+        _readNativeBannerId;
+    final nativeId = (await nativeLoader())?.trim();
+    if (nativeId != null && nativeId.isNotEmpty) return nativeId;
 
-      return androidTestBannerUnitId;
-    }
-
-    final iosDefineId = (iosDefineOverride ?? _dartDefineIosBannerId).trim();
-    if (iosDefineId.isNotEmpty) return iosDefineId;
-    return iosTestBannerUnitId;
+    return isAndroid ? androidTestBannerUnitId : iosTestBannerUnitId;
   }
 
-  static Future<String?> _readAndroidManifestBannerId() async {
+  static Future<String?> _readNativeBannerId() async {
     try {
       final config =
           await _channel.invokeMapMethod<String, dynamic>('getAdConfig');

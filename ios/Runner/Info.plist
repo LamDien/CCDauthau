@@ -26,6 +26,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>GADApplicationIdentifier</key>
 	<string>$(ADMOB_IOS_APP_ID)</string>
+	<key>CcDauThauAdMobBannerId</key>
+	<string>$(ADMOB_IOS_BANNER_ID)</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
