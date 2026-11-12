@@ -19,6 +19,8 @@ abstract final class AdConfig {
       String.fromEnvironment('ADMOB_IOS_BANNER_ID');
   static const bool _useProdInDebug =
       bool.fromEnvironment('ADMOB_USE_PROD_IN_DEBUG');
+  static const bool _useTestAds =
+      bool.fromEnvironment('ADMOB_USE_TEST_ADS');
 
   static const MethodChannel _channel =
       MethodChannel('vn.ccdauthau/ad_config');
@@ -40,6 +42,7 @@ abstract final class AdConfig {
     TargetPlatform? platformOverride,
     bool? isDebugModeOverride,
     bool? useProdInDebugOverride,
+    bool? useTestAdsOverride,
     String? androidDefineOverride,
     String? iosDefineOverride,
     Future<String?> Function()? androidNativeBannerIdLoader,
@@ -51,6 +54,13 @@ abstract final class AdConfig {
       platformOverride: platform,
     )) {
       return null;
+    }
+
+    final forceTestAds = useTestAdsOverride ?? _useTestAds;
+    if (forceTestAds) {
+      return platform == TargetPlatform.android
+          ? androidTestBannerUnitId
+          : iosTestBannerUnitId;
     }
 
     final isDebug = isDebugModeOverride ?? kDebugMode;

@@ -54,6 +54,7 @@ class GoogleMobileAdsBannerService implements AdBannerService {
 
     final timer = Timer(loadTimeout, () {
       if (!completer.isCompleted) {
+        debugPrint('AdMob banner load timed out after ${loadTimeout.inSeconds}s');
         unawaited(bannerAd.dispose());
         completer.complete(null);
       }
@@ -114,13 +115,26 @@ class GoogleMobileAdsBannerService implements AdBannerService {
     Orientation orientation,
   ) async {
     try {
-      final adaptive =
+      final largeAdaptive =
           await AdSize.getLargeAnchoredAdaptiveBannerAdSizeWithOrientation(
         orientation,
         widthDp,
       );
-      if (adaptive != null && adaptive.height <= maxTopBannerHeightDp) {
-        return adaptive;
+      if (largeAdaptive != null &&
+          largeAdaptive.height <= maxTopBannerHeightDp) {
+        return largeAdaptive;
+      }
+
+      // Standard anchored adaptive banner stays <= 64dp across portrait phones
+      // where the large variant exceeds the compact top slot budget.
+      // ignore: deprecated_member_use
+      final compactAdaptive = await AdSize.getAnchoredAdaptiveBannerAdSize(
+        orientation,
+        widthDp,
+      );
+      if (compactAdaptive != null &&
+          compactAdaptive.height <= maxTopBannerHeightDp) {
+        return compactAdaptive;
       }
     } catch (_) {
       // Fallback safely to fixed compact banner size when SDK query fails.

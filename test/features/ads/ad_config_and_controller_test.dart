@@ -121,6 +121,16 @@ void main() {
         iosDefineOverride: '',
       );
       expect(iosReleaseDefault, AdConfig.iosTestBannerUnitId);
+
+      final forcedTestAdsInRelease = await AdConfig.resolveBannerUnitId(
+        isWebOverride: false,
+        platformOverride: TargetPlatform.android,
+        isDebugModeOverride: false,
+        useTestAdsOverride: true,
+        androidDefineOverride: 'ca-app-pub-custom/define-unit',
+        androidNativeBannerIdLoader: () async => fakeNativeUnitId,
+      );
+      expect(forcedTestAdsInRelease, AdConfig.androidTestBannerUnitId);
     });
   });
 
